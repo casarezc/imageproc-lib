@@ -62,6 +62,7 @@ void __attribute__((__interrupt__)) _DMA0Interrupt(void);
 static unsigned int adc_MotorA, adc_MotorB, adc_MotorC, adc_MotorD; // motors
 static unsigned int adc_AN8, adc_AN9, adc_AN10, adc_AN11;           //also motors
 static unsigned int adc_AN0, adc_Vbatt; //battery
+static unsigned int adc_AN1, adc_Vload; //load cell
 
 void adcSetup(void){
 	adcSetupPeripheral();
@@ -101,8 +102,9 @@ static void adcSetupPeripheral(void) {
 
 
     AD1CSSHvalue = SCAN_NONE_16_31; //Skip AN16-AN131 for Input Scan, not avail on dsPic33
-    //Scan: AN0, AN8, AN9, AN10, AN11
+    //Scan: AN0, AN1, AN8, AN9, AN10, AN11
     AD1CSSLvalue = SCAN_NONE_0_15 | (1 << 0) //AN0
+                                  | (1 << 1) //AN1
                                   | (1 << 8) //AN8
                                   | (1 << 9) //AN9
                                   | (1 << 10) //AN10
@@ -111,6 +113,7 @@ static void adcSetupPeripheral(void) {
     //Set pins to analog inputs; also check init_default.c
     AD1PCFGHvalue = ENABLE_ALL_DIG_16_31; //Shouldn't matter, only AN0-15 on 706A
     AD1PCFGLvalue = ENABLE_AN0_ANA & //Battery
+            ENABLE_AN1_ANA & // Load cell
             ENABLE_AN8_ANA & //Motor A
             ENABLE_AN9_ANA & //Motor B
             ENABLE_AN10_ANA & //Motor C
@@ -122,7 +125,7 @@ static void adcSetupPeripheral(void) {
 
     //The following is a "patch" to the above settings
     AD1CON1bits.AD12B = 0; //10bit mode
-    AD1CON2bits.SMPI = 5-1;  //every 5th sample
+    AD1CON2bits.SMPI = 6-1;  //every 6th sample
     AD1CON2bits.CHPS = 0;
     AD1CON1bits.SIMSAM = 0; //overridden
     AD1CON1bits.ADDMABM = 0;
@@ -134,6 +137,7 @@ static void adcSetupPeripheral(void) {
     AD1CON2bits.CSCNA = 1;
     AD1CSSL = 0; //clear it first
     AD1CSSLbits.CSS0 = 1;
+    AD1CSSLbits.CSS1 = 1;
     AD1CSSLbits.CSS8 = 1;
     AD1CSSLbits.CSS9 = 1;
     AD1CSSLbits.CSS10 = 1;
@@ -167,6 +171,10 @@ unsigned int adcGetAN0(){
 	return adc_AN0;
 }
 
+unsigned int adcGetAN1(){
+	return adc_AN1;
+}
+
 unsigned int adcGetAN8(){
 	return adc_AN8;
 }
@@ -186,6 +194,10 @@ unsigned int adcGetAN11(){
 //Getters for other modules to access values
 unsigned int adcGetVbatt(){
 	return adc_Vbatt;
+}
+
+unsigned int adcGetVload(){
+	return adc_Vload;
 }
 
 unsigned int adcGetMotorA(){
@@ -211,8 +223,8 @@ unsigned int adcGetMotorD(){
 #define  SAMP_BUFF_SIZE	 		1		// Size of the input buffer per analog input
 
 //Buffers need special attribute to be in DMA memory space
-static int  BufferA[5][SAMP_BUFF_SIZE] __attribute__((space(dma)));
-static int  BufferB[5][SAMP_BUFF_SIZE] __attribute__((space(dma)));
+static int  BufferA[6][SAMP_BUFF_SIZE] __attribute__((space(dma)));
+static int  BufferB[6][SAMP_BUFF_SIZE] __attribute__((space(dma)));
 
 static unsigned int DmaBuffer = 0;
 
@@ -229,7 +241,7 @@ static void initDma0(void) {
 
     DMA0PAD = (int) &ADC1BUF0;
     //DMA0CNT = (SAMP_BUFF_SIZE*2)-1;
-    DMA0CNT = 4; //See dsPIC user's manual. 5 analog reads -> DMA0CNT = 5-1 = 4
+    DMA0CNT = 5; //See dsPIC user's manual. 6 analog reads -> DMA0CNT = 6-1 = 5
 
     DMA0REQ = 13; //ADC1 requests
 
@@ -254,20 +266,23 @@ void __attribute__((interrupt, no_auto_psv)) _DMA0Interrupt(void) {
     LED_3 = 1;
     if (DmaBuffer == 0) {
         adc_AN0 = BufferA[0][0];  //AN0
-        adc_AN8 = BufferA[1][0];  //AN8
-        adc_AN9 = BufferA[2][0];  //AN9
-        adc_AN10 = BufferA[3][0]; //AN10
-        adc_AN11 = BufferA[4][0]; //AN11
+        adc_AN1 = BufferA[1][0];  //AN1
+        adc_AN8 = BufferA[2][0];  //AN8
+        adc_AN9 = BufferA[3][0];  //AN9
+        adc_AN10 = BufferA[4][0]; //AN10
+        adc_AN11 = BufferA[5][0]; //AN11
     } else {
         adc_AN0 = BufferB[0][0];  //AN0
-        adc_AN8 = BufferB[1][0];  //AN8
-        adc_AN9 = BufferB[2][0];  //AN9
-        adc_AN10 = BufferB[3][0]; //AN10
-        adc_AN11 = BufferB[4][0]; //AN11
+        adc_AN1 = BufferB[1][0];  //AN1
+        adc_AN8 = BufferB[2][0];  //AN8
+        adc_AN9 = BufferB[3][0];  //AN9
+        adc_AN10 = BufferB[4][0]; //AN10
+        adc_AN11 = BufferB[5][0]; //AN11
     }
 
     //Update named variables
     adc_Vbatt  = adc_AN0;
+    adc_Vload = adc_AN1;
     adc_MotorA = adc_AN8;
     adc_MotorB = adc_AN9;
     adc_MotorC = adc_AN10;
