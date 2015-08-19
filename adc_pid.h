@@ -5,7 +5,9 @@ void adcSetup(void); //Top level config function, to be called from main
 
 //Getters for other modules to access values, by useful name
 unsigned int adcGetVbatt();
-unsigned int adcGetVload();
+unsigned int adcGetAccx();
+unsigned int adcGetAccy();
+unsigned int adcGetAccz();
 unsigned int adcGetMotorA();
 unsigned int adcGetMotorB();
 unsigned int adcGetMotorC();
@@ -14,6 +16,8 @@ unsigned int adcGetMotorD();
 //Getters for other modules to access values, by AN pin name
 unsigned int adcGetAN0();
 unsigned int adcGetAN1();
+unsigned int adcGetAN3();
+unsigned int adcGetAN4();
 unsigned int adcGetAN8();
 unsigned int adcGetAN9();
 unsigned int adcGetAN10();
