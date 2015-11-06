@@ -59,7 +59,7 @@ void __attribute__((__interrupt__)) _DMA0Interrupt(void);
 
 
 //Variables to store values as they come out of the DMA buffer
-static unsigned int adc_MotorA, adc_MotorB, adc_MotorC, adc_MotorD; // motors
+static unsigned int adc_Motor[4]; // motors
 static unsigned int adc_AN8, adc_AN9, adc_AN10, adc_AN11;           //also motors
 static unsigned int adc_AN0, adc_Vbatt; //battery
 static unsigned int adc_AN1, adc_Vload; //load cell
@@ -200,20 +200,8 @@ unsigned int adcGetVload(){
 	return adc_Vload;
 }
 
-unsigned int adcGetMotorA(){
-	return adc_MotorA;
-}
-
-unsigned int adcGetMotorB(){
-	return adc_MotorB;
-}
-
-unsigned int adcGetMotorC(){
-	return adc_MotorC;
-}
-
-unsigned int adcGetMotorD(){
-	return adc_MotorD;
+unsigned int adcGetMotor(unsigned char motor_num){
+	return adc_Motor[motor_num - 1];
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -283,10 +271,10 @@ void __attribute__((interrupt, no_auto_psv)) _DMA0Interrupt(void) {
     //Update named variables
     adc_Vbatt  = adc_AN0;
     adc_Vload = adc_AN1;
-    adc_MotorA = adc_AN8;
-    adc_MotorB = adc_AN9;
-    adc_MotorC = adc_AN10;
-    adc_MotorD = adc_AN11;
+    adc_Motor[0] = adc_AN8;
+    adc_Motor[1] = adc_AN9;
+    adc_Motor[2] = adc_AN10;
+    adc_Motor[3] = adc_AN11;
 
     DmaBuffer ^= 1; //Toggle between buffers
     //LED_3 = 0;
