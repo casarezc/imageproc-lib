@@ -48,7 +48,7 @@
 
 
 #define MAX_HALL 0x4000 // maximum Hall sensor value
-#define NUM_ENC 4
+// #define NUM_ENC 4   (moved this to imageproc-settings
 
 //Leg position struct
 typedef struct {
