@@ -97,17 +97,17 @@ void amsEncoderSetup(void) {
     // 2. send slave register address <a7:a0>,
     // 3. send slave <a2:a1>, a0=R (read reg data)
     // 4. read slave data <a7:a0>
-    encAddr[0] = 0b10000001;        //Encoder 0 rd;wr A1, A2 = low
-    encAddr[1] = 0b10000000;        // write
+    encAddr[0] = 0b10000101;        //Encoder 0 rd;wr A2 = high, A1 = low
+    encAddr[1] = 0b10000100;
 
-    encAddr[2] = 0b10000011;        //Encoder 1 rd;wr A2 = low, A1 = high
-    encAddr[3] = 0b10000010;
+    encAddr[2] = 0b10000111;        //Encoder 1 rd;wr A2, A1 = high
+    encAddr[3] = 0b10000110;
 
-    encAddr[4] = 0b10000101;        //Encoder 2 rd;wr A2 = high, A1 = low
-    encAddr[5] = 0b10000100;
+    encAddr[4] = 0b10000001;        //Encoder 2 rd;wr A1, A2 = low
+    encAddr[5] = 0b10000000;        // write
 
-    encAddr[6] = 0b10000111;        //Encoder 3 rd;wr A2, A1 = high
-    encAddr[7] = 0b10000110;
+    encAddr[6] = 0b10000011;        //Encoder 3 rd;wr A2 = low, A1 = high
+    encAddr[7] = 0b10000010;
 
     encoder_number = 0;
     encoder_new_pos = 0;
