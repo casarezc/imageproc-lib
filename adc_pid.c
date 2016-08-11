@@ -62,7 +62,7 @@ void __attribute__((__interrupt__)) _DMA0Interrupt(void);
 static unsigned int adc_Motor[4]; // motors
 static unsigned int adc_AN8, adc_AN9, adc_AN10, adc_AN11;           //also motors
 static unsigned int adc_AN0, adc_Vbatt; //battery
-static unsigned int adc_AN1, adc_Vload; //load cell
+static unsigned int adc_AN1, adc_Vsense; //Sensor voltage
 
 void adcSetup(void){
 	adcSetupPeripheral();
@@ -196,8 +196,8 @@ unsigned int adcGetVbatt(){
 	return adc_Vbatt;
 }
 
-unsigned int adcGetVload(){
-	return adc_Vload;
+unsigned int adcGetVsense(){
+	return adc_Vsense;
 }
 
 unsigned int adcGetMotor(unsigned char motor_num){
@@ -270,7 +270,7 @@ void __attribute__((interrupt, no_auto_psv)) _DMA0Interrupt(void) {
 
     //Update named variables
     adc_Vbatt  = adc_AN0;
-    adc_Vload = adc_AN1;
+    adc_Vsense = adc_AN1;
     adc_Motor[0] = adc_AN8;
     adc_Motor[1] = adc_AN9;
     adc_Motor[2] = adc_AN10;
