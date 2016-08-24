@@ -116,44 +116,44 @@ void amsEncoderSetup(void) {
     //setup I2C port I2C1
     encoderSetupPeripheral();
 
-    amsEncoderResetPos();
+    amsEncoderResetPos(LEFT_LEGS_ENC_NUM);
+    amsEncoderResetPos(RIGHT_LEGS_ENC_NUM);
+    amsEncoderResetPos(TAIL_ENC_NUM);
 }
 
-void amsEncoderResetPos(void) {
-    // initialize structure
-    int i;
-    for(i = 0; i< NUM_ENC; i++) {
-        //amsEncoderBlockingRead(i);    // get initial values w/o setting oticks
-        //encPos[i].offset = encPos[i].pos; // initialize encoder
-        encPos[i].calibPos = 0;
-        encPos[i].oticks = 0;   // set revolution counter to 0
+void amsEncoderResetPos(unsigned char encoder_number) {
+    // Hack to set encoder offset to current position if it's the tail encoder
+    if(encoder_number==TAIL_ENC_NUM){
+        //amsEncoderBlockingRead(encoder_number);    // blocking read doesn't work as intended, for now rely on interrupt to take most recent read
+        encPos[encoder_number].offset = encPos[encoder_number].pos; // set offset to current position
     }
+    encPos[encoder_number].calibPos = 0;
+    encPos[encoder_number].oticks = 0;   // set revolution counter to 0
 
-    //Set up offset
-    //TODO: maybe move these to NVM somewhere in the flash, rather than project defines
-#ifdef AMS_ENC_OFFSET_0
-    encPos[0].offset = AMS_ENC_OFFSET_0;
-#else
-    encPos[0].offset = 0;
-#endif
+    //Set up offset for drive encoders
+    #ifdef AMS_ENC_OFFSET_0
+        encPos[0].offset = AMS_ENC_OFFSET_0;
+    #else
+        encPos[0].offset = 0;
+    #endif
 
-#ifdef AMS_ENC_OFFSET_1
-    encPos[1].offset = AMS_ENC_OFFSET_1;
-#else
-    encPos[1].offset = 0;
-#endif
+    #ifdef AMS_ENC_OFFSET_1
+        encPos[1].offset = AMS_ENC_OFFSET_1;
+    #else
+        encPos[1].offset = 0;
+    #endif
 
-#ifdef AMS_ENC_OFFSET_2
-    encPos[2].offset = AMS_ENC_OFFSET_2;
-#else
-    encPos[2].offset = 0;
-#endif
-
-#ifdef AMS_ENC_OFFSET_3
-    encPos[3].offset = AMS_ENC_OFFSET_3;
-#else
-    encPos[3].offset = 0;
-#endif
+//#ifdef AMS_ENC_OFFSET_2
+//    encPos[2].offset = AMS_ENC_OFFSET_2;
+//#else
+//    encPos[2].offset = 0;
+//#endif
+//
+//#ifdef AMS_ENC_OFFSET_3
+//    encPos[3].offset = AMS_ENC_OFFSET_3;
+//#else
+//    encPos[3].offset = 0;
+//#endif
 
 }
 

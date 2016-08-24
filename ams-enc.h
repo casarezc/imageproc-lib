@@ -70,10 +70,10 @@ void amsEncoderSetup(void);
 /*****************************************************************************
  * Function Name : amsEncoderResetPos
  * Description   : Reset encoder structure with blocking read of current encoder
- * Parameters    : None
+ * Parameters    : num - which encoder to reset
  * Return Value  : None
  *****************************************************************************/
-void amsEncoderResetPos(void);
+void amsEncoderResetPos(unsigned char encoder_number);
 
 /*****************************************************************************
  * Function Name : amsGetPos/encSumPos
